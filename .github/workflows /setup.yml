@@ -1,4 +1,4 @@
-name: Run Lab5
+name: Run Main
 
 on:
   push:
