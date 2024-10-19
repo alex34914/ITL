@@ -3,10 +3,10 @@ name: Run Main
 on:
   push:
     branches:
-      - main
+      - main  
   pull_request:
     branches:
-      - main
+      - main  
 
 jobs:
   run:
@@ -16,14 +16,21 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Set up Miniconda
-        uses: goanpeca/conda-action@v2
-        with:
-          auto-update-conda: true
-          environment-file: setup.yml  
-          activate-environment: myenv    
+      - name: Install Miniconda
+        run: |
+          # Установка Miniconda
+          wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
+          bash miniconda.sh -b -p $HOME/miniconda
+          echo "$HOME/miniconda/bin" >> $GITHUB_PATH
+          conda init bash
+          source $HOME/miniconda/etc/profile.d/conda.sh
+
+      - name: Create environment
+        run: |
+          conda env create -f setup.yml 
+          conda activate myenv            
 
       - name: Run main.py
         run: |
           cd main                     
-          python test.py             
+          python test.py              
