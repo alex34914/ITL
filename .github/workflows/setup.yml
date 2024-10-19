@@ -3,10 +3,10 @@ name: Run Main
 on:
   push:
     branches:
-      - lab1
+      - main
   pull_request:
     branches:
-      - lab1
+      - main
 
 jobs:
   run:
@@ -25,5 +25,5 @@ jobs:
 
       - name: Run main.py
         run: |
-          cd lab1                     
-          python main.py             
+          cd main                     
+          python test.py             
