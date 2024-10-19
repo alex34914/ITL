@@ -27,8 +27,9 @@ jobs:
 
       - name: Create environment
         run: |
-          conda env create -f setup.yml 
-          conda activate myenv            
+          cd main                          
+          conda env create -f setup.yml   
+          echo "conda activate myenv" >> $GITHUB_ENV 
 
       - name: Run main.py
         run: |
