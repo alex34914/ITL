@@ -1,12 +1,12 @@
-name: Run Main in Lab1
+name: Run Main
 
 on:
   push:
     branches:
-      - lab1 
+      - lab1
   pull_request:
     branches:
-      - lab1  
+      - lab1
 
 jobs:
   run:
@@ -14,7 +14,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2 
+        uses: actions/checkout@v2
 
       - name: Install Miniconda
         run: |
@@ -25,11 +25,9 @@ jobs:
 
       - name: Create environment
         run: |
-          cd lab1
-          conda env create -f setup.yml
+          conda env create -f setup.yml  
           echo "conda activate myenv" >> $GITHUB_ENV
 
       - name: Run main.py
         run: |
-          cd lab1
-          conda run -n myenv python main.py
+          conda run -n myenv python main.py  
