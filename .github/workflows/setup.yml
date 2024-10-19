@@ -12,7 +12,5 @@ jobs:
   run:
     runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout lab1 branch
-        uses: actions/checkout@v2
+
        
