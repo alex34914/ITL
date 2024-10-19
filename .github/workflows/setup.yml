@@ -1,0 +1,29 @@
+name: Run Main
+
+on:
+  push:
+    branches:
+      - lab1
+  pull_request:
+    branches:
+      - lab1
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Miniconda
+        uses: goanpeca/conda-action@v2
+        with:
+          auto-update-conda: true
+          environment-file: setup.yml  
+          activate-environment: myenv    
+
+      - name: Run main.py
+        run: |
+          cd lab1                     
+          python main.py             
