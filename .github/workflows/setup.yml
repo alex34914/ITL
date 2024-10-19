@@ -15,30 +15,4 @@ jobs:
     steps:
       - name: Checkout lab1 branch
         uses: actions/checkout@v2
-        with:
-          ref: lab1  # Явно указываем, что нужно проверить ветку lab1
-          fetch-depth: 0  # Скачиваем полный репозиторий, чтобы гарантировать доступ ко всем веткам
-
-      - name: List root directory content for debugging
-        run: ls -la  # Проверка содержимого корневой директории
-
-      - name: Install Miniconda
-        run: |
-          wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
-          bash miniconda.sh -b -p $HOME/miniconda
-          echo "$HOME/miniconda/bin" >> $GITHUB_PATH
-          source $HOME/miniconda/etc/profile.d/conda.sh
-
-      - name: List lab1 directory content
-        run: ls -la lab1 || echo "lab1 folder does not exist"  # Проверяем существование директории lab1
-
-      - name: Create environment
-        run: |
-          cd lab1
-          conda env create -f setup.yml
-          echo "conda activate myenv" >> $GITHUB_ENV
-
-      - name: Run main.py
-        run: |
-          cd lab1
-          conda run -n myenv python main.py
+       
