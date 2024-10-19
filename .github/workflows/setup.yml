@@ -13,10 +13,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout code from lab1 branch
         uses: actions/checkout@v2
         with:
-          ref: lab1 # Указываем ветку lab1
+          ref: lab1  # Здесь указываем ветку lab1
+
+      - name: List repository content for debugging
+        run: ls -la  # Смотрим содержимое репозитория для проверки
 
       - name: Install Miniconda
         run: |
@@ -27,9 +30,11 @@ jobs:
 
       - name: Create environment
         run: |
-          conda env create -f lab1/setup.yml
+          cd lab1
+          conda env create -f setup.yml
           echo "conda activate myenv" >> $GITHUB_ENV
 
       - name: Run main.py
         run: |
-          conda run -n myenv python lab1/main.py
+          cd lab1
+          conda run -n myenv python main.py
