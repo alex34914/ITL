@@ -6,7 +6,7 @@ on:
       - lab1
   pull_request:
     branches:
-      - lab1
+      - '**'
 
 jobs:
   run:
