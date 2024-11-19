@@ -34,24 +34,3 @@ class Product(db.Model):
             "stock": self.stock,
             "description": self.description
         }
-
-class Order(db.Model):
-    """
-    Модель для представления заказа.
-    """
-    __tablename__ = 'orders'
-    id = db.Column(db.Integer, primary_key=True)
-    product_id = db.Column(db.Integer, db.ForeignKey('products.id'), nullable=False)
-    quantity = db.Column(db.Integer, nullable=False)
-    order_date = db.Column(db.String(10), nullable=False)
-    total_amount = db.Column(db.Float, nullable=False)
-    product = db.relationship('Product', backref=db.backref('orders', lazy=True))
-
-    def __init__(self, product_id: int, quantity: int, order_date: str, total_amount: float):
-        self.product_id = product_id
-        self.quantity = quantity
-        self.order_date = order_date
-        self.total_amount = total_amount
-
-    def __repr__(self) -> str:
-        return f'<Order {self.id} - Product {self.product_id}>'
