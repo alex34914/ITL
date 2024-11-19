@@ -1,53 +1,65 @@
-# client/client_app.py
 import sys
+from typing import Optional, Dict, Any
 import requests
 from PyQt6.QtWidgets import (
     QApplication, QWidget, QVBoxLayout, QTableWidget, QTableWidgetItem,
     QPushButton, QDialog, QLineEdit, QFormLayout, QHBoxLayout, QMessageBox
 )
+from config import API_URL
 
-API_URL = "http://127.0.0.1:5000"
 
 class ClientApp(QWidget):
-    def __init__(self):
+    """
+    Client application for interacting with the API.
+
+    Provides a GUI to display, add, edit, and delete products.
+    """
+
+    def __init__(self) -> None:
+        """
+        Initializes the main application window.
+        """
         super().__init__()
         self.setWindowTitle('Client for API')
         self.setGeometry(100, 100, 800, 600)
         self.init_ui()
 
-    def init_ui(self):
+    def init_ui(self) -> None:
+        """
+        Sets up the main UI components.
+        """
         layout = QVBoxLayout(self)
 
-        # Таблица для отображения продуктов
         self.table = QTableWidget(self)
-        self.table.setColumnCount(4)  # Добавлена колонка для Category
+        self.table.setColumnCount(4)
         self.table.setHorizontalHeaderLabels(["ID", "Name", "Category", "Actions"])
         layout.addWidget(self.table)
 
-        # Кнопка для добавления нового продукта
         self.add_button = QPushButton("Add New Product", self)
         self.add_button.clicked.connect(self.add_product)
         layout.addWidget(self.add_button)
 
-        # Загрузка списка продуктов
         self.load_products()
-
         self.setLayout(layout)
 
-    def load_products(self):
+    def load_products(self) -> None:
+        """
+        Fetches and displays the list of products from the API.
+        """
         try:
             response = requests.get(f"{API_URL}/products")
             response.raise_for_status()
             products = response.json()
+
             self.table.setRowCount(len(products))
             for row_idx, product in enumerate(products):
                 self.table.setItem(row_idx, 0, QTableWidgetItem(str(product.get("id"))))
                 self.table.setItem(row_idx, 1, QTableWidgetItem(product.get("name")))
                 self.table.setItem(row_idx, 2, QTableWidgetItem(product.get("category", "")))
 
-                # Кнопки Edit и Delete
                 edit_button = QPushButton("Edit")
                 edit_button.clicked.connect(lambda checked, p_id=product.get("id"): self.edit_product(p_id))
+
                 delete_button = QPushButton("Delete")
                 delete_button.clicked.connect(lambda checked, p_id=product.get("id"): self.delete_product(p_id))
 
@@ -61,7 +73,10 @@ class ClientApp(QWidget):
         except requests.exceptions.RequestException as e:
             QMessageBox.critical(self, "Error", f"Failed to load products:\n{e}")
 
-    def add_product(self):
+    def add_product(self) -> None:
+        """
+        Opens a dialog to add a new product.
+        """
         dialog = ProductDialog(self)
         if dialog.exec() == QDialog.DialogCode.Accepted:
             new_product = dialog.get_product_data()
@@ -75,11 +90,17 @@ class ClientApp(QWidget):
             except requests.exceptions.RequestException as e:
                 QMessageBox.critical(self, "Error", f"Failed to add product:\n{e}")
 
-    def edit_product(self, product_id):
+    def edit_product(self, product_id: int) -> None:
+        """
+        Opens a dialog to edit an existing product.
+
+        :param product_id: ID of the product to edit
+        """
         try:
             response = requests.get(f"{API_URL}/products/{product_id}")
             response.raise_for_status()
             product_data = response.json()
+
             dialog = ProductDialog(self, product_data)
             if dialog.exec() == QDialog.DialogCode.Accepted:
                 updated_product = dialog.get_product_data()
@@ -92,7 +113,12 @@ class ClientApp(QWidget):
         except requests.exceptions.RequestException as e:
             QMessageBox.critical(self, "Error", f"Failed to fetch product data:\n{e}")
 
-    def delete_product(self, product_id):
+    def delete_product(self, product_id: int) -> None:
+        """
+        Deletes a product after user confirmation.
+
+        :param product_id: ID of the product to delete
+        """
         reply = QMessageBox.question(
             self, 'Confirm Deletion',
             f"Are you sure you want to delete product ID {product_id}?",
@@ -110,14 +136,28 @@ class ClientApp(QWidget):
             except requests.exceptions.RequestException as e:
                 QMessageBox.critical(self, "Error", f"Failed to delete product:\n{e}")
 
+
 class ProductDialog(QDialog):
-    def __init__(self, parent=None, data=None):
+    """
+    Dialog for adding or editing a product.
+    """
+
+    def __init__(self, parent: Optional[QWidget] = None, data: Optional[Dict[str, Any]] = None) -> None:
+        """
+        Initializes the product dialog.
+
+        :param parent: Parent widget
+        :param data: Existing product data (optional)
+        """
         super().__init__(parent)
         self.setWindowTitle("Product Form")
         self.data = data or {}
         self.init_ui()
 
-    def init_ui(self):
+    def init_ui(self) -> None:
+        """
+        Sets up the dialog UI.
+        """
         layout = QFormLayout(self)
 
         self.name_input = QLineEdit(self)
@@ -140,7 +180,6 @@ class ProductDialog(QDialog):
         self.description_input.setText(self.data.get("description", ""))
         layout.addRow("Description:", self.description_input)
 
-        # Кнопки OK и Cancel
         buttons_layout = QHBoxLayout()
         self.accept_button = QPushButton("OK", self)
         self.accept_button.clicked.connect(self.validate_and_accept)
@@ -152,8 +191,10 @@ class ProductDialog(QDialog):
 
         self.setLayout(layout)
 
-    def validate_and_accept(self):
-        # Валидация полей перед отправкой
+    def validate_and_accept(self) -> None:
+        """
+        Validates the input fields and accepts the dialog if valid.
+        """
         if not self.name_input.text().strip():
             QMessageBox.warning(self, "Validation Error", "Name field cannot be empty.")
             return
@@ -175,18 +216,20 @@ class ProductDialog(QDialog):
             return
         self.accept()
 
-    def get_product_data(self):
-        # Обработка некорректного ввода для stock и price уже выполнена в validate_and_accept
-        price_value = float(self.price_input.text()) if self.price_input.text() else 0.0
-        stock_value = int(self.stock_input.text()) if self.stock_input.text() else 0
+    def get_product_data(self) -> Dict[str, Any]:
+        """
+        Returns the product data entered in the dialog.
 
+        :return: Product data as a dictionary
+        """
         return {
             "name": self.name_input.text(),
             "category": self.category_input.text(),
-            "price": price_value,
-            "stock": stock_value,
+            "price": float(self.price_input.text()) if self.price_input.text() else 0.0,
+            "stock": int(self.stock_input.text()) if self.stock_input.text() else 0,
             "description": self.description_input.text()
         }
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
