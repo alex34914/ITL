@@ -1,14 +1,19 @@
-# app.py
 from flask import Flask, request, jsonify
 from database import create_app
 from models import db, Product
 from flask_cors import CORS
+from typing import Union, Dict
 
 app = create_app()
-CORS(app)  
+CORS(app)
 
 @app.route('/products', methods=['GET'])
-def get_products():
+def get_products() -> Union[Dict[str, str], Dict[str, Union[str, int]]]:
+    """
+    Получает список всех продуктов из базы данных.
+    
+    :return: Список продуктов в формате JSON или сообщение об ошибке.
+    """
     try:
         products = Product.query.all()
         return jsonify([product.to_dict() for product in products]), 200
@@ -16,7 +21,13 @@ def get_products():
         return jsonify({"error": str(e)}), 500
 
 @app.route('/products/<int:product_id>', methods=['GET'])
-def get_product(product_id):
+def get_product(product_id: int) -> Union[Dict[str, str], Dict[str, Union[str, int]]]:
+    """
+    Получает продукт по его ID из базы данных.
+
+    :param product_id: ID продукта.
+    :return: Продукт в формате JSON или сообщение об ошибке.
+    """
     try:
         product = Product.query.get(product_id)
         if product:
@@ -27,7 +38,12 @@ def get_product(product_id):
         return jsonify({"error": str(e)}), 500
 
 @app.route('/products', methods=['POST'])
-def create_product():
+def create_product() -> Union[Dict[str, str], Dict[str, Union[str, int]]]:
+    """
+    Создает новый продукт в базе данных.
+
+    :return: Созданный продукт в формате JSON или сообщение об ошибке.
+    """
     data = request.get_json()
     try:
         if not data.get('name') or data.get('price') is None or data.get('stock') is None:
@@ -47,7 +63,13 @@ def create_product():
         return jsonify({"error": str(e)}), 500
 
 @app.route('/products/<int:product_id>', methods=['PUT'])
-def update_product(product_id):
+def update_product(product_id: int) -> Union[Dict[str, str], Dict[str, Union[str, int]]]:
+    """
+    Обновляет информацию о продукте в базе данных.
+
+    :param product_id: ID продукта.
+    :return: Обновленный продукт в формате JSON или сообщение об ошибке.
+    """
     data = request.get_json()
     try:
         product = Product.query.get(product_id)
@@ -67,7 +89,13 @@ def update_product(product_id):
         return jsonify({"error": str(e)}), 500
 
 @app.route('/products/<int:product_id>', methods=['DELETE'])
-def delete_product(product_id):
+def delete_product(product_id: int) -> Union[Dict[str, str], Dict[str, Union[str, int]]]:
+    """
+    Удаляет продукт из базы данных по его ID.
+
+    :param product_id: ID продукта.
+    :return: Сообщение об успешном удалении или ошибке.
+    """
     try:
         product = Product.query.get(product_id)
         if not product:
